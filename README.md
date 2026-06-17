@@ -49,6 +49,7 @@ Le guide de déploiement complet, étape par étape, est disponible dans le fich
 
 ## 5. Structure du Dépôt
 
+```text
 .
 ├── dags/
 │   └── weather_dag.py              # Pipeline batch Airflow (API Open-Meteo)
@@ -63,5 +64,4 @@ Le guide de déploiement complet, étape par étape, est disponible dans le fich
 ├── SETUP.md                        # Guide d'installation et de lancement
 └── README.md                       # Documentation du projet
 
-## 6. Auteurs et Remerciements
-Projet réalisé dans le cadre du cursus de Master 1. Architecturé et implémenté pour répondre aux exigences d'ingénierie de flux en temps réel, de conception de schémas spatiaux et d'orchestration de données.
+```
