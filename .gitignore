@@ -1,0 +1,14 @@
+# Fichiers secrets
+.env
+
+# Dossiers systèmes Python
+__pycache__/
+*.pyc
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Logs et données d'exécution Docker/Airflow
+logs/
