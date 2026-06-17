@@ -9,7 +9,8 @@ Les conditions météorologiques (en particulier la vitesse et la direction du v
 
 ## 2. Architecture Technique
 
-![alt text](aviation_pipeline_architecture.png)
+<img width="2728" height="2480" alt="aviation_pipeline_architecture" src="https://github.com/user-attachments/assets/0e1d2b15-de10-4c60-83e7-6a84e7eb41c3" />
+
 
 Le système repose sur une architecture hybride intégrant des traitements Batch et Streaming, orchestrés au sein d'un environnement conteneurisé.
 
