@@ -54,17 +54,29 @@ Le guide de déploiement complet, étape par étape, est disponible dans le fich
 
 ```text
 .
-├── dags/
-│   └── weather_dag.py              # Pipeline batch Airflow (API Open-Meteo)
-├── streaming/
-│   ├── opensky_producer.py         # Producteur API réelle (Limité par quotas)
-│   ├── opensky_mock_producer.py    # Producteur Mock (Déploiement soutenance/tests)
-│   └── opensky_consumer.py         # Consommateur Kafka et jointure PostGIS
-├── dashboard/
+├── dags/                           # Dossier Airflow
+│   └── weather_dag.py              # Pipeline batch de récupération météo
+├── dashboard/                      # Dossier de l'interface utilisateur
 │   └── app.py                      # Application de visualisation Streamlit
-├── docker-compose.yml              # Configuration de l'infrastructure
-├── requirements.txt                # Dépendances Python
-├── SETUP.md                        # Guide d'installation et de lancement
-└── README.md                       # Documentation du projet
-
+├── diagram/                        # Modèles et schémas (draw.io)
+│   └── aviation_pipeline.drawio
+├── Pics/                           # Captures d'écran pour la documentation
+├── plugins/                        # Plugins éventuels pour Airflow ou extensions
+├── streaming/                      # Dossier des flux temps réel
+│   ├── opensky_producer.py         # Producteur OpenSky réel
+│   ├── opensky_mock_producer.py    # Producteur mock pour tests
+│   └── opensky_consumer.py         # Consommateur Kafka et enrichissement spatial
+├── .gitignore                      # Liste des fichiers et dossiers exclus du dépôt
+├── docker-compose.yml              # Configuration Docker Compose
+├── requirement.txt                 # Liste des dépendances Python
+├── SETUP.md                        # Guide d'installation et de déploiement
+├── test_meteo.py                   # Tests de l'API météo
+├── test_opensky.py                 # Tests de l'API OpenSky
+└── README.md                       # Documentation principale du projet
 ```
+
+> Note : Certains fichiers et dossiers ne sont pas transmis sur Git car ils sont exclus par `.gitignore`, notamment :
+> * `.env`
+> * `__pycache__/` et `*.pyc`
+> * environnements virtuels (`.venv/`, `venv/`, `env/`)
+> * `logs/`
