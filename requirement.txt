@@ -1,0 +1,20 @@
+# ==========================================
+# Projet : Real-Time Stream Enrichment
+# ==========================================
+
+# --- 1. Manipulation et Calculs de Données ---
+pandas
+numpy
+
+# --- 2. Interface Utilisateur (Dashboard) ---
+streamlit
+pydeck
+plotly
+
+# --- 3. Base de données & SQL ---
+psycopg2-binary
+SQLAlchemy
+
+# --- 4. Streaming & Requêtes API ---
+kafka-python
+requests

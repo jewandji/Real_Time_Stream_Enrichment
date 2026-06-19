@@ -14,7 +14,7 @@ Les conditions météorologiques (en particulier la vitesse et la direction du v
 Le système repose sur une architecture hybride intégrant des traitements Batch et Streaming, orchestrés au sein d'un environnement conteneurisé.
 
 ### 2.1. Sources de Données
-* Trafic Aérien (Streaming) : OpenSky Network API (simulé via un Mock Producer pour des raisons de résilience face aux limites de requêtes de l'API publique).
+* Trafic Aérien (Streaming) : OpenSky Network API (simulé via un Mock Producer pour des raisons de résilience face aux limites de requêtes de l'API publique) https://opensky-network.org/ .
 * Météorologie (Batch) : Open-Meteo API.
 
 ### 2.2. Pipeline de Traitement

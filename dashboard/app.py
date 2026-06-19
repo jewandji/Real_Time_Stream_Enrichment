@@ -4,6 +4,9 @@ import psycopg2
 import time
 import pydeck as pdk
 import plotly.express as px
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore', message=".*pandas only supports SQLAlchemy.*")
 
 st.set_page_config(page_title="FlightTracker", page_icon="✈️", layout="wide")
 
@@ -62,21 +65,46 @@ with placeholder.container():
         # --- ROUTAGE DES VUES ---
         if menu == "Carte en Direct":
             if not df.empty:
-                # Utilisation de ScatterplotLayer pour être sûr à 100% que les points s'affichent
-                layer = pdk.Layer(
+                # 1. Calcul de la trajectoire (la petite queue derrière l'avion)
+                df['tail_lon'] = df['longitude'] - (df['velocity'] * 0.02) * np.sin(np.radians(df['true_track']))
+                df['tail_lat'] = df['latitude'] - (df['velocity'] * 0.02) * np.cos(np.radians(df['true_track']))
+
+                # 2. Pré-calcul de la couleur selon le vent
+                def get_wind_color(wind_speed):
+                    if pd.isna(wind_speed): return [128, 128, 128, 200] # Gris
+                    if wind_speed < 10: return [0, 255, 0, 200]       # Vert (Calme)
+                    elif wind_speed < 25: return [255, 165, 0, 200]   # Orange (Modéré)
+                    else: return [255, 0, 0, 200]                     # Rouge (Fort)
+                
+                # Application de la fonction
+                df['color'] = df['weather_wind_speed'].apply(get_wind_color)
+
+                # 3. Création des couches
+                trail_layer = pdk.Layer(
+                    "LineLayer",
+                    data=df,
+                    get_source_position=["tail_lon", "tail_lat"],
+                    get_target_position=["longitude", "latitude"],
+                    get_color=[200, 200, 200, 150],
+                    get_width=2,
+                )
+
+                plane_layer = pdk.Layer(
                     "ScatterplotLayer",
                     data=df,
                     get_position=["longitude", "latitude"],
-                    get_radius=15000, # Rayon de 15km pour bien les voir
-                    get_fill_color="[weather_wind_speed > 30 ? 255 : 0, 100, weather_wind_speed > 30 ? 0 : 255, 200]",
+                    get_radius=15000, 
+                    get_fill_color="color", # Utilisation de notre nouvelle colonne de couleur
                     pickable=True
                 )
-                view_state = pdk.ViewState(latitude=46.603354, longitude=1.888334, zoom=4.5, pitch=0) # Centré sur la France
+
+                # 4. Affichage de la carte
+                view_state = pdk.ViewState(latitude=46.603354, longitude=1.888334, zoom=4.5, pitch=0)
                 
                 st.pydeck_chart(pdk.Deck(
                     map_style=None,
                     initial_view_state=view_state,
-                    layers=[layer],
+                    layers=[trail_layer, plane_layer], # On met bien les deux couches ici
                     tooltip={"text": "Vol: {callsign}\nVent: {weather_wind_speed} km/h\nAlt: {altitude} m"}
                 ))
             else:
@@ -84,7 +112,7 @@ with placeholder.container():
 
         elif menu == "Analyse Météo":
             if not df.empty:
-                # Première ligne de graphiques (ceux que tu as déjà)
+                # Première ligne de graphiques
                 c1, c2 = st.columns(2)
                 with c1:
                     st.subheader("💨 Impact du vent sur la vitesse")
@@ -102,27 +130,24 @@ with placeholder.container():
 
                 st.markdown("---")
 
-                # Deuxième ligne de graphiques (Les nouveautés !)
+                # Deuxième ligne de graphiques
                 c3, c4 = st.columns(2)
                 with c3:
                     st.subheader("📊 Distribution des Altitudes")
-                    # Un bel histogramme pour voir les paliers de vol
                     fig_hist = px.histogram(
                         df, x="altitude", nbins=20,
                         labels={"altitude": "Altitude (m)"},
-                        color_discrete_sequence=['#00C4B4'] # Couleur stylée
+                        color_discrete_sequence=['#00C4B4']
                     )
                     fig_hist.update_layout(yaxis_title="Nombre d'avions")
                     st.plotly_chart(fig_hist, use_container_width=True)
                     
                 with c4:
                     st.subheader("⚠️ Top 5 : Pires conditions de vent")
-                    # On isole les 5 avions affrontant le plus de vent
                     top_wind = df.nlargest(5, 'weather_wind_speed')[['callsign', 'altitude', 'weather_wind_speed', 'weather_temp']]
                     top_wind.columns = ["Vol", "Altitude (m)", "Vent (km/h)", "Température (°C)"]
-                    # On affiche un tableau propre sans l'index
                     st.dataframe(top_wind, use_container_width=True, hide_index=True)
-
+            
         elif menu == "Données Brutes":
             st.dataframe(df.head(50), use_container_width=True)
 
